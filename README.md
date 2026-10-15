@@ -94,7 +94,7 @@ Asal skor risiko dijelaskan di kolom `Score_source`:
 - **Mahasiswa Dropout dan Graduate:** skor *out-of-fold*. Model menilai tiap mahasiswa tanpa pernah melihat data mahasiswa itu, sehingga skor tidak bocor. Pada mahasiswa berlabel, kelompok risiko **Tinggi benar-benar dropout 93,5%**, **Sedang 37,5%**, dan **Rendah 7,7%**.
 - **Mahasiswa Enrolled:** skor dari model final. Ini prediksi potensi dropout untuk masa mendatang. Dari 794 mahasiswa `Enrolled`, 370 masuk risiko Tinggi, 83 Sedang, dan 341 Rendah.
 
-**Link dashboard:** __https://datastudio.google.com/reporting/6d7ba714-3d61-4b09-997f-fd2b0ae6e8f8_
+**Link dashboard:** https://datastudio.google.com/reporting/6d7ba714-3d61-4b09-997f-fd2b0ae6e8f8 
 
 ### Metrik utama yang dipantau
 
@@ -192,7 +192,7 @@ Streamlit membuka aplikasi di `http://localhost:8501`.
 4. Pada **Advanced settings**, pilih Python 3.11.
 5. Klik **Deploy**. Tunggu hingga aplikasi aktif.
 
-**Link prototype:** _https://student-dropout-predictor-a5w4awroq9fnjtr8imm4xn.streamlit.app/_
+**Link prototype:** https://student-dropout-predictor-a5w4awroq9fnjtr8imm4xn.streamlit.app/
 
 ## Conclusion
 
