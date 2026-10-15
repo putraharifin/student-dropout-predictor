@@ -111,7 +111,7 @@ Asal skor risiko dijelaskan di kolom `Score_source`:
 | Dropout per program studi | Dropout / total per `Course_name` | Menemukan program yang bermasalah. |
 
 
-### layout dashboard (Looker Studio)
+### Layout Dashboard (Looker Studio)
 
 Gunakan 4 halaman (tab). Beri filter global di bagian atas: **Program studi**, **Kelompok usia**, **Gender**, **Waktu kuliah**, dan **Status**.
 
@@ -136,8 +136,8 @@ Gunakan 4 halaman (tab). Beri filter global di bagian atas: **Program studi**, *
 
 | Komponen                            | Jenis chart               | Field                                                                    |
 | ----------------------------------- | ------------------------- | ------------------------------------------------------------------------ |
-| MK lulus semester 1 vs semester 2   | Line Chart (Grafik Garis)        | `Curricular_units_1st_sem_approved`, `Curricular_units_2nd_sem_approved` |
-| Distribusi nilai semester           | Box plot per status       | `Curricular_units_1st_sem_grade`, `Curricular_units_2nd_sem_grade`       |
+| MK lulus semester 1 vs semester 2   | Scatter plot        | `Curricular_units_1st_sem_approved`, `Curricular_units_2nd_sem_approved` |
+| Distribusi nilai semester           | Line Chart (Grafik Garis)       | `Curricular_units_1st_sem_grade`, `Curricular_units_2nd_sem_grade`       |
 | Rata-rata MK lulus                  | Bar chart berkelompok     | Semester x `Status`                                                      |
 | Persentase 0 MK lulus di semester 2 | Bar chart                 | `Curricular_units_2nd_sem_approved = 0` per `Status`                     |
 
@@ -162,7 +162,7 @@ Gunakan 4 halaman (tab). Beri filter global di bagian atas: **Program studi**, *
 
 ## Menjalankan Sistem Machine Learning
 
-Prototype memakai Streamlit. Aplikasi memuat model `model/model.joblib`, menerima data mahasiswa, lalu menampilkan prediksi `Dropout`, `Active/Enrolled`, atau `Graduate`.
+Prototype memakai Streamlit. Aplikasi memuat model `model/model.joblib`, menerima data mahasiswa, lalu menampilkan prediksi **Dropout** atau **Graduate** beserta peluangnya. Mahasiswa berstatus `Enrolled` dapat dinilai juga. Hasilnya adalah potensi di masa mendatang.
 
 **Jalankan secara lokal:**
 
@@ -178,28 +178,29 @@ streamlit run app.py atau python -m streamlit run app.py
 Streamlit membuka aplikasi di `http://localhost:8501`.
 
 **Cara memakai aplikasi:**
-
 1. Isi data mahasiswa di **sidebar** (profil, keuangan, semester 1, semester 2). Atau pilih **Muat contoh profil** untuk mengisi form dengan cepat.
-2. Lihat hasil di tab **Prediksi satu mahasiswa**. Aplikasi menampilkan status prediksi, peluang tiap kelas, tingkat risiko, dan saran tindak lanjut.
-3. Untuk banyak mahasiswa, buka tab **Prediksi massal (CSV)**. Unggah file dengan kolom seperti `data.csv`, lalu unduh hasilnya.
+2. Lihat hasil di tab **Prediksi satu mahasiswa**. Aplikasi menampilkan prediksi (Dropout atau Graduate), peluang Dropout, tingkat risiko, dan saran tindak lanjut.
+3. Untuk banyak mahasiswa, buka tab **Prediksi massal (CSV)**. Unggah file dengan kolom seperti `data.csv` (boleh memuat mahasiswa `Enrolled`), lalu unduh hasilnya.
 4. Aplikasi memberi peringatan bila keyakinan model di bawah 70%. Tinjau kasus seperti itu secara manual.
+5. Prediksi dropout memakai ambang 0,5. Peluang di atas ambang berarti `Dropout`.
 
 **Deploy ke Streamlit Community Cloud:**
 
 1. Unggah folder proyek ke repositori GitHub. Pastikan `app.py`, `requirements.txt`, dan `model/model.joblib` ikut terunggah.
 2. Buka [share.streamlit.io](https://share.streamlit.io), lalu pilih **Create app**.
 3. Pilih repositori, branch, dan file utama `app.py`.
-4. Pada **Advanced settings**, pilih Python 3.12 (minimal 3.11).
+4. Pada **Advanced settings**, pilih Python 3.11.
 5. Klik **Deploy**. Tunggu hingga aplikasi aktif.
 
 **Link prototype:** _https://student-dropout-predictor-a5w4awroq9fnjtr8imm4xn.streamlit.app/_
 
 ## Conclusion
 
-**Kondisi data.** Sebanyak 32,1% mahasiswa dropout, 49,9% lulus, dan 17,9% masih aktif. Data bersih tanpa nilai kosong atau duplikat.
+**Kondisi data.** Dataset berisi 4.424 mahasiswa: 49,9% lulus, 32,1% dropout, dan 17,9% masih aktif (`Enrolled`). Data bersih tanpa nilai kosong atau duplikat.
+
+**Penyiapan data untuk model.** Mahasiswa `Enrolled` belum punya hasil akhir, sehingga kita mengeluarkannya dari pelatihan. Data modeling berisi 3.630 mahasiswa: 2.209 `Graduate` (60,9%) dan 1.421 `Dropout` (39,1%). Target dibuat biner (1 = Dropout, 0 = Graduate). Data dibagi 80:20 dengan `stratify`: 2.904 data latih dan 726 data uji. Sebanyak 794 mahasiswa `Enrolled` disimpan sebagai data prediksi.
 
 **Faktor yang paling berkaitan dengan dropout.**
-
 - **Kelulusan mata kuliah.** Rata-rata mata kuliah lulus semester 1 adalah 2,6 (Dropout), 4,3 (Enrolled), dan 6,2 (Graduate). Sekitar 51% mahasiswa dropout tidak lulus satu pun mata kuliah di semester 2. Pada lulusan angkanya hanya 3%.
 - **Keuangan.** Mahasiswa yang menunggak biaya kuliah dropout sekitar 87%. Yang membayar tepat waktu dropout sekitar 25%. Debitur dropout sekitar 62%.
 - **Beasiswa.** Penerima beasiswa dropout sekitar 12%. Non-penerima sekitar 39%.
@@ -208,36 +209,42 @@ Streamlit membuka aplikasi di `http://localhost:8501`.
 - **Program studi.** Keperawatan hanya sekitar 15%. Teknik Informatika, Equinikultur, dan Manajemen kelas malam berada di atas 50%.
 - **Faktor yang lemah.** Nilai masuk, kewarganegaraan, status internasional, kebutuhan khusus, dan inflasi hampir tidak membedakan status.
 
-**Performa model.** XGBoost terpilih karena macro F1 validasi silangnya tertinggi (0,739). Hasil pada data uji (885 mahasiswa):
+(Angka EDA di atas dihitung pada seluruh mahasiswa, termasuk `Enrolled`, agar gambaran institusi utuh.)
 
-| Metrik                  | Nilai |
-| ----------------------- | ----- |
-| Accuracy                | 73,7% |
-| Macro F1                | 0,694 |
-| ROC-AUC (one-vs-rest)   | 0,889 |
-| Precision kelas Dropout | 0,81  |
-| Recall kelas Dropout    | 0,69  |
+**Performa model.** LightGBM terpilih karena F1 Dropout validasi silangnya tertinggi (0,874). Hasil pada data uji (726 mahasiswa):
 
-Model berkinerja baik untuk `Dropout` dan `Graduate`. Model lemah pada kelas `Enrolled` (F1 sekitar 0,50). Status ini berada di antara dua kelas lain dan belum final. Keempat model berkinerja mirip. Selisihnya masih dalam rentang variasi validasi silang.
+| Metrik | Nilai |
+|--------|-------|
+| Accuracy | 93,1% |
+| Precision kelas Dropout | 0,903 |
+| Recall kelas Dropout | 0,923 |
+| F1 kelas Dropout | 0,913 |
+| ROC-AUC | 0,973 |
+
+Dari 726 mahasiswa uji, model melewatkan 22 calon dropout dan menandai 28 calon lulusan secara keliru. Keempat algoritma berkinerja tinggi dan mirip. Logistic Regression baseline juga kuat (akurasi 92,1%, ROC-AUC 0,976). Selisihnya masih dalam rentang variasi validasi silang.
 
 **Fitur terpenting model.** `approval_rate_sem2` (rasio kelulusan semester 2) dan `Tuition_fees_up_to_date` (pembayaran tepat waktu). Fitur lain berkontribusi jauh lebih kecil.
 
+**Ambang keputusan.** Ambang 0,5 memberi keseimbangan yang baik. Ambang 0,3 menaikkan recall ke 0,937, tetapi presisi turun ke 0,847. Ambang 0,7 menaikkan presisi ke 0,945, tetapi recall turun ke 0,908. Institusi dapat memilih sesuai kapasitas bimbingan.
+
 **Seberapa dini bisa mendeteksi?**
 
-| Titik waktu      | Accuracy | Macro F1 | ROC-AUC |
-| ---------------- | -------- | -------- | ------- |
-| Saat pendaftaran | 58,4%    | 0,549    | 0,773   |
-| Akhir semester 1 | 71,1%    | 0,667    | 0,866   |
-| Akhir semester 2 | 73,7%    | 0,694    | 0,889   |
+| Titik waktu | Accuracy | Recall Dropout | F1 Dropout | ROC-AUC |
+|-------------|----------|----------------|------------|---------|
+| Saat pendaftaran | 76,6% | 0,697 | 0,700 | 0,844 |
+| Akhir semester 1 | 88,8% | 0,877 | 0,860 | 0,950 |
+| Akhir semester 2 | 93,1% | 0,923 | 0,913 | 0,973 |
 
 Data pendaftaran saja belum cukup. Setelah semester 1, model sudah mendekati kinerja penuh. Maka institusi sebaiknya menjalankan peringatan dini **tepat setelah semester 1**.
 
-**Keyakinan model.** Prediksi dengan keyakinan di atas 0,9 benar 97,4%. Prediksi dengan keyakinan di bawah 0,7 benar hanya 41-51%. Staf perlu meninjau kasus yang tidak yakin secara manual.
+**Keyakinan model.** Prediksi dengan keyakinan di atas 0,9 benar 96,8% (622 dari 726 kasus). Prediksi dengan keyakinan 0,5-0,7 benar hanya sekitar 56-61%. Staf perlu meninjau kasus yang tidak yakin secara manual.
+
+**Prediksi mahasiswa Enrolled.** Model menilai 794 mahasiswa `Enrolled`: 398 diprediksi berpotensi `Dropout` dan 396 `Graduate`. Sebanyak 370 mahasiswa masuk risiko Tinggi. Mahasiswa `Enrolled` yang menunggak uang kuliah punya rata-rata peluang dropout 0,84, dibanding 0,48 pada yang membayar tepat waktu. Ini hasil model, bukan fakta. Model tidak bisa divalidasi pada kelompok ini karena labelnya belum ada.
 
 **Keterbatasan.**
-
 - Data berasal dari satu institusi. Uji ulang model sebelum memakainya pada kohort baru.
 - Hasil menunjukkan hubungan, bukan sebab-akibat.
+- Mahasiswa `Enrolled` mungkin berbeda dari populasi pelatihan, karena mereka masih kuliah di akhir masa studi normal. Anggap prediksi mereka sebagai sinyal untuk ditinjau, bukan vonis.
 - Aplikasi Streamlit memakai model penuh (semester 1 dan 2). Model khusus semester 1 baru dievaluasi di notebook.
 
 ## Rekomendasi Action Items
@@ -247,11 +254,13 @@ Data pendaftaran saja belum cukup. Setelah semester 1, model sudah mendekati kin
 3. **Jalankan program bimbingan akademik setelah semester 1.** Jalankan model pada akhir semester 1. Beri mentor, kelas remedial, atau tutor sebaya kepada mahasiswa berisiko Tinggi dan Sedang. Beri perhatian ekstra bila rasio kelulusan di bawah 50%. Beri perhatian segera bila tidak ada mata kuliah lulus.
 4. **Dukung mahasiswa dewasa dan kelas malam.** Dropout melonjak setelah usia 22 tahun. Tawarkan jadwal fleksibel, kelas hibrida, dan layanan konsultasi di luar jam kerja. Kelas malam dropout sekitar 43% dibanding 31% pada kelas siang.
 5. **Evaluasi program studi berisiko.** Periksa kurikulum, beban SKS, dan dukungan dosen pada Teknik Informatika, Equinikultur, dan Manajemen kelas malam. Pelajari praktik baik dari Keperawatan (dropout sekitar 15%).
-6. **Jadikan skor risiko bagian dari proses rutin.** Hasilkan daftar risiko tiap akhir semester dari aplikasi atau `dashboard_data.csv`. Mulai dari risiko Tinggi (90,8% benar-benar dropout pada data ini). Tinjau manual prediksi dengan keyakinan di bawah 70%.
-7. **Perkaya data dan perbarui model.** Tambahkan data kehadiran, aktivitas e-learning, status bekerja, dan hasil survei kepuasan. Data ini dapat memperbaiki prediksi kelas `Enrolled`. Latih ulang model setiap tahun dan ukur dampak intervensi (turunnya tingkat dropout pada kelompok yang dibimbing).
+6. **Jadikan skor risiko bagian dari proses rutin.** Hasilkan daftar risiko tiap akhir semester dari aplikasi atau `dashboard_data.csv`. Mulai dari risiko Tinggi (93,5% benar-benar dropout pada data berlabel). Tinjau manual prediksi dengan keyakinan di bawah 70%.
+7. **Perkaya data dan perbarui model.** Tambahkan data kehadiran, aktivitas e-learning, status bekerja, dan hasil survei kepuasan. Data ini dapat memperkuat prediksi untuk mahasiswa yang polanya tidak jelas. Setelah status akhir mahasiswa `Enrolled` diketahui, tambahkan mereka ke data latih. Latih ulang model setiap tahun dan ukur dampak intervensi (turunnya tingkat dropout pada kelompok yang dibimbing).
 
-**Contoh target yang dapat dipantau di dashboard** _(usulan, sesuaikan dengan kebijakan institusi)_: tingkat dropout, jumlah mahasiswa risiko tinggi yang sudah dihubungi, tingkat menunggak, dan rasio kelulusan mata kuliah semester 1.
+8. **Prioritaskan mahasiswa `Enrolled` berisiko tinggi sekarang.** Sebanyak 370 mahasiswa aktif masuk risiko Tinggi. Mereka masih bisa dibantu sebelum status akhir terbentuk. Hubungi dulu yang menunggak biaya kuliah atau yang tidak lulus mata kuliah di semester terakhir. Catat hasil intervensi, lalu bandingkan dengan prediksi model.
+
+**Contoh target yang dapat dipantau di dashboard** *(usulan, sesuaikan dengan kebijakan institusi)*: tingkat dropout, jumlah mahasiswa risiko tinggi yang sudah dihubungi, tingkat menunggak, dan rasio kelulusan mata kuliah semester 1.
 
 ## Acknowledgements
 
-Realinho, V., Vieira Martins, M., Machado, J., dan Baptista, L. (2021). _Predict students' dropout and academic success._ UCI Machine Learning Repository. https://doi.org/10.24432/C5MC89
+Realinho, V., Vieira Martins, M., Machado, J., dan Baptista, L. (2021). *Predict students' dropout and academic success.* UCI Machine Learning Repository. https://doi.org/10.24432/C5MC89
