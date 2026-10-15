@@ -188,7 +188,7 @@ Streamlit membuka aplikasi di `http://localhost:8501`.
 4. Pada **Advanced settings**, pilih Python 3.12 (minimal 3.11).
 5. Klik **Deploy**. Tunggu hingga aplikasi aktif.
 
-**Link prototype:** _(tempel link Streamlit Community Cloud Anda di sini)_
+**Link prototype:** _https://student-dropout-predictor-a5w4awroq9fnjtr8imm4xn.streamlit.app/_
 
 ## Conclusion
 
