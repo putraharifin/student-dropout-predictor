@@ -1,17 +1,17 @@
 {
   "model": "XGBoost",
   "test_metrics": {
-    "Accuracy": 0.7367231638418079,
-    "Precision (macro)": 0.6977675380127127,
-    "Recall (macro)": 0.7005330072774697,
-    "F1 (macro)": 0.693586217282612,
-    "F1 (weighted)": 0.745415540781649,
-    "ROC-AUC (OvR)": 0.8891216839116428,
-    "Recall Dropout": 0.6936619718309859
+    "Accuracy": 0.735593220338983,
+    "Precision (macro)": 0.698083495575533,
+    "Recall (macro)": 0.7042252853089014,
+    "F1 (macro)": 0.6950532692101992,
+    "F1 (weighted)": 0.7450069820674878,
+    "ROC-AUC (OvR)": 0.8878171213404227,
+    "Recall Dropout": 0.6971830985915493
   },
   "cv_tuning": {
-    "Random Forest": 0.715959562026038,
-    "XGBoost": 0.7388759150332401,
+    "Random Forest": 0.7178358855272765,
+    "XGBoost": 0.7333655340577431,
     "LightGBM": 0.7309850373628038
   }
 }

@@ -61,10 +61,10 @@ submission
 ├── app.py                    # prototype Streamlit
 ├── requirements.txt
 ├── README.md
-└── username_dicoding-dashboard.png   # screenshot dashboard (tambahkan sendiri)
+└── putraharifin25-dashboard.png
 ```
 
-**Setup environment:** gunakan Python 3.11 atau lebih baru.
+**Setup environment:**  Python yang digunakan versi 3.11.
 
 ```bash
 # 1. Buat virtual environment
@@ -106,7 +106,7 @@ Skor risiko berasal dari prediksi _out-of-fold_. Model menilai tiap mahasiswa ta
 | Cakupan beasiswa                       | Penerima beasiswa / total                              | Penerima dropout sekitar 12%, non-penerima 39%.      |
 | Dropout per program studi              | Dropout / total per `Course_name`                      | Menemukan program yang bermasalah.                   |
 
-### Rancangan layout dashboard (Looker Studio / Tableau)
+### layout dashboard (Looker Studio)
 
 Gunakan 4 halaman (tab). Beri filter global di bagian atas: **Program studi**, **Kelompok usia**, **Gender**, **Waktu kuliah**, dan **Status**.
 
@@ -164,7 +164,8 @@ Prototype memakai Streamlit. Aplikasi memuat model `model/model.joblib`, menerim
 pip install -r requirements.txt
 
 # 2. Jalankan aplikasi dari folder proyek
-streamlit run app.py
+streamlit run app.py atau python -m streamlit run app.py
+
 ```
 
 Streamlit membuka aplikasi di `http://localhost:8501`.
