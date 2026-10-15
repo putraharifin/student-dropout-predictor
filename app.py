@@ -17,11 +17,11 @@ st.set_page_config(page_title="Prediksi Dropout | Jaya Jaya Institut",
                    page_icon="🎓", layout="wide")
 
 MODEL_PATH = Path(__file__).parent / "model" / "model.joblib"
-URUTAN_KELAS = ["Dropout", "Enrolled", "Graduate"]
+# Model biner: kode 1 = Dropout, kode 0 = Graduate. Mahasiswa Enrolled tidak dipakai untuk melatih model.
+# Aplikasi ini menilai potensi Dropout atau Graduate, termasuk untuk mahasiswa yang masih aktif (Enrolled).
 LABEL_HASIL = {
-    "Dropout": "Dropout (berisiko putus kuliah)",
-    "Enrolled": "Active / Enrolled (masih aktif kuliah)",
-    "Graduate": "Graduate (diprediksi lulus)",
+    "Dropout": "Berpotensi DROPOUT (berisiko putus kuliah)",
+    "Graduate": "Berpotensi GRADUATE (diprediksi lulus)",
 }
 
 
@@ -52,7 +52,8 @@ def tambah_fitur(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def prediksi(model, data_mentah: pd.DataFrame) -> np.ndarray:
-    return model.predict_proba(tambah_fitur(data_mentah))
+    """Mengembalikan peluang Dropout (kelas 1) untuk setiap baris."""
+    return model.predict_proba(tambah_fitur(data_mentah))[:, 1]
 
 
 def tingkat_risiko(p_dropout: float) -> str:
@@ -71,6 +72,7 @@ except FileNotFoundError:
     st.stop()
 
 model = bundle["model"]
+AMBANG = float(bundle.get("ambang", 0.5))
 FITUR = bundle["fitur_input"]
 DEFAULT = bundle["defaults"]
 OPSI = bundle["opsi_nominal"]
@@ -106,13 +108,13 @@ CONTOH = {
         "Curricular_units_2nd_sem_enrolled": 6, "Curricular_units_2nd_sem_evaluations": 7,
         "Curricular_units_2nd_sem_approved": 6, "Curricular_units_2nd_sem_grade": 14.0,
     },
-    "Abu-abu: bayar lancar, lulus separuh": {
+    "Sedang: bayar lancar, 4 dari 6 MK lulus": {
         "Tuition_fees_up_to_date": 1, "Debtor": 0, "Scholarship_holder": 0,
         "Age_at_enrollment": 21, "Gender": 1,
         "Curricular_units_1st_sem_enrolled": 6, "Curricular_units_1st_sem_evaluations": 8,
-        "Curricular_units_1st_sem_approved": 3, "Curricular_units_1st_sem_grade": 11.0,
+        "Curricular_units_1st_sem_approved": 4, "Curricular_units_1st_sem_grade": 13.0,
         "Curricular_units_2nd_sem_enrolled": 6, "Curricular_units_2nd_sem_evaluations": 8,
-        "Curricular_units_2nd_sem_approved": 3, "Curricular_units_2nd_sem_grade": 11.0,
+        "Curricular_units_2nd_sem_approved": 4, "Curricular_units_2nd_sem_grade": 13.0,
     },
 }
 
@@ -230,10 +232,10 @@ tab_satu, tab_massal, tab_info = st.tabs(["🔍 Prediksi satu mahasiswa", "📂 
 with tab_satu:
     baris = {k: st.session_state[k] for k in FITUR}
     df_input = pd.DataFrame([baris])[FITUR]
-    proba = prediksi(model, df_input)[0]
-    p = dict(zip(URUTAN_KELAS, proba))
-    kelas = URUTAN_KELAS[int(np.argmax(proba))]
-    risiko = tingkat_risiko(p["Dropout"])
+    p_dropout = float(prediksi(model, df_input)[0])
+    p_graduate = 1 - p_dropout
+    kelas = "Dropout" if p_dropout >= AMBANG else "Graduate"
+    risiko = tingkat_risiko(p_dropout)
 
     for sem, nama in [("1st", "semester 1"), ("2nd", "semester 2")]:
         if baris[f"Curricular_units_{sem}_sem_approved"] > baris[f"Curricular_units_{sem}_sem_enrolled"]:
@@ -242,23 +244,21 @@ with tab_satu:
     st.subheader("Hasil prediksi")
     if kelas == "Dropout":
         st.error(f"### 🔴 {LABEL_HASIL[kelas]}")
-    elif kelas == "Enrolled":
-        st.warning(f"### 🟡 {LABEL_HASIL[kelas]}")
     else:
         st.success(f"### 🟢 {LABEL_HASIL[kelas]}")
 
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Peluang Dropout", f"{p['Dropout']:.1%}")
-    c2.metric("Peluang Active/Enrolled", f"{p['Enrolled']:.1%}")
-    c3.metric("Peluang Graduate", f"{p['Graduate']:.1%}")
-    c4.metric("Tingkat risiko dropout", risiko)
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Peluang Dropout", f"{p_dropout:.1%}")
+    c2.metric("Peluang Graduate", f"{p_graduate:.1%}")
+    c3.metric("Tingkat risiko dropout", risiko)
 
-    st.bar_chart(pd.DataFrame({"Peluang": [p["Dropout"], p["Enrolled"], p["Graduate"]]},
-                              index=["Dropout", "Active/Enrolled", "Graduate"]), height=200)
+    st.bar_chart(pd.DataFrame({"Peluang": [p_dropout, p_graduate]}, index=["Dropout", "Graduate"]),
+                 horizontal=True, height=160)
 
-    if proba.max() < 0.70:
+    if max(p_dropout, p_graduate) < 0.70:
         st.info("Keyakinan model di bawah 70%. Pada data uji, prediksi seperti ini jauh kurang akurat. "
                 "Tinjau mahasiswa ini secara manual.")
+    st.caption("Untuk mahasiswa berstatus Enrolled, hasil ini adalah **potensi** di masa mendatang, bukan kepastian.")
 
     # Sinyal peringatan berbasis temuan EDA
     turunan = tambah_fitur(df_input).iloc[0]
@@ -309,13 +309,12 @@ with tab_massal:
             if hilang:
                 st.error(f"Kolom berikut tidak ada di file: {', '.join(hilang)}")
             else:
-                pr = prediksi(model, data[FITUR])
+                p_drop = prediksi(model, data[FITUR])
                 hasil = data.copy()
-                hasil["Peluang_Dropout"] = pr[:, 0].round(4)
-                hasil["Peluang_Enrolled"] = pr[:, 1].round(4)
-                hasil["Peluang_Graduate"] = pr[:, 2].round(4)
-                hasil["Prediksi"] = [URUTAN_KELAS[i] for i in pr.argmax(axis=1)]
-                hasil["Tingkat_Risiko"] = [tingkat_risiko(v) for v in pr[:, 0]]
+                hasil["Peluang_Dropout"] = p_drop.round(4)
+                hasil["Peluang_Graduate"] = (1 - p_drop).round(4)
+                hasil["Prediksi"] = np.where(p_drop >= AMBANG, "Dropout", "Graduate")
+                hasil["Tingkat_Risiko"] = [tingkat_risiko(v) for v in p_drop]
 
                 k1, k2, k3, k4 = st.columns(4)
                 k1.metric("Jumlah mahasiswa", f"{len(hasil):,}")
@@ -323,14 +322,19 @@ with tab_massal:
                 k3.metric("Risiko sedang", f"{(hasil['Tingkat_Risiko'] == 'Sedang').sum():,}")
                 k4.metric("Risiko rendah", f"{(hasil['Tingkat_Risiko'] == 'Rendah').sum():,}")
 
-                st.bar_chart(hasil["Prediksi"].value_counts().reindex(URUTAN_KELAS, fill_value=0))
+                st.bar_chart(hasil["Prediksi"].value_counts().reindex(["Dropout", "Graduate"], fill_value=0))
+                if "Status" in hasil.columns:
+                    st.write("Sebaran tingkat risiko menurut kolom `Status` di file:")
+                    st.dataframe(pd.crosstab(hasil["Tingkat_Risiko"], hasil["Status"])
+                                 .reindex(["Tinggi", "Sedang", "Rendah"]).fillna(0).astype(int))
                 tampil = ["Peluang_Dropout", "Prediksi", "Tingkat_Risiko"]
                 st.dataframe(hasil.sort_values("Peluang_Dropout", ascending=False)[tampil + FITUR[:8]],
                              width="stretch", height=380)
                 st.download_button("⬇️ Unduh hasil prediksi (CSV)",
                                    hasil.to_csv(index=False).encode("utf-8"),
                                    file_name="hasil_prediksi_dropout.csv", mime="text/csv")
-                st.caption("Catatan: data yang sama dengan data latih akan terlihat sangat akurat. "
+                st.caption("Mahasiswa berstatus Enrolled boleh ikut diunggah. Hasilnya adalah potensi, bukan kepastian. "
+                           "Data berlabel yang sama dengan data latih akan terlihat sangat akurat. "
                            "Gunakan data kohort baru untuk evaluasi yang jujur.")
         except Exception as e:  # noqa: BLE001
             st.error(f"File tidak dapat diproses: {e}")
@@ -338,26 +342,31 @@ with tab_massal:
 # ---- Tab 3: info ----------------------------------------------------------
 with tab_info:
     m = bundle["metrics_test"]
-    st.subheader(f"Model: {bundle['model_name']}")
-    a, b, c, d = st.columns(4)
+    st.subheader(f"Model: {bundle['model_name']} (klasifikasi biner)")
+    a, b, c, d, e = st.columns(5)
     a.metric("Accuracy (data uji)", f"{m['Accuracy']:.1%}")
-    b.metric("Macro F1", f"{m['F1 (macro)']:.3f}")
-    c.metric("ROC-AUC", f"{m['ROC-AUC (OvR)']:.3f}")
-    d.metric("Recall Dropout", f"{m['Recall Dropout']:.1%}")
+    b.metric("Precision Dropout", f"{m['Precision (Dropout)']:.1%}")
+    c.metric("Recall Dropout", f"{m['Recall (Dropout)']:.1%}")
+    d.metric("F1 Dropout", f"{m['F1 (Dropout)']:.3f}")
+    e.metric("ROC-AUC", f"{m['ROC-AUC']:.3f}")
     st.markdown(
         """
 **Cara kerja.** Model membaca data pendaftaran, keuangan, dan kinerja akademik semester 1-2.
-Model lalu menghitung peluang tiga status: `Dropout`, `Enrolled`, dan `Graduate`.
+Model lalu menghitung peluang mahasiswa **Dropout** atau **Graduate**.
+
+**Data pelatihan.** Model hanya dilatih dengan mahasiswa berstatus `Dropout` dan `Graduate`
+(3.630 mahasiswa). Mahasiswa `Enrolled` belum punya hasil akhir, sehingga tidak dipakai untuk melatih model.
+Mereka dipakai sebagai data prediksi: model menilai **potensi** mereka untuk dropout atau lulus.
 
 **Cara membaca hasil.**
-- Peluang dropout 60% atau lebih berarti risiko **tinggi**.
-- Peluang 30-60% berarti risiko **sedang**.
-- Peluang di bawah 30% berarti risiko **rendah**.
+- Peluang dropout 50% atau lebih menghasilkan prediksi **Dropout**. Di bawah itu, prediksi **Graduate**.
+- Tingkat risiko: 60% atau lebih = **tinggi**, 30-60% = **sedang**, di bawah 30% = **rendah**.
+- Pada data berlabel, kelompok risiko tinggi benar-benar dropout sekitar 93%, sedang 38%, dan rendah 8%.
 
 **Keterbatasan.**
-- Kelas `Enrolled` paling sulit diprediksi (F1 sekitar 0,50).
 - Model memakai data satu institusi. Uji ulang sebelum dipakai pada kohort baru.
 - Model menunjukkan hubungan, bukan sebab-akibat.
+- Prediksi untuk mahasiswa `Enrolled` tidak dapat divalidasi, karena label akhirnya belum ada.
 - Aplikasi ini memakai model penuh (data semester 1 dan 2). Jangan mengisi semester 2 dengan angka 0
   bila datanya belum ada. Model membaca angka 0 sebagai tanda dropout yang kuat.
         """
