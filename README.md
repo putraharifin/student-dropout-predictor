@@ -8,23 +8,23 @@ Proyek ini membangun sistem deteksi dini mahasiswa yang berisiko _dropout_. Sist
 
 ## Business Understanding
 
-Jaya Jaya Institut adalah institusi pendidikan tinggi yang berdiri sejak tahun 2000. Institusi ini telah meluluskan banyak alumni dengan reputasi baik. Namun banyak mahasiswa tidak menyelesaikan studinya atau _dropout_.
+Jaya Jaya Institut adalah institusi pendidikan tinggi yang berdiri sejak tahun 2000. Institusi ini telah meluluskan banyak alumni dengan reputasi baik. Namun, seiring berjalannya waktu, institusi menghadapi tantangan serius terkait banyaknya mahasiswa yang tidak menyelesaikan studinya atau memutuskan untuk _dropout_.
 
-Dropout yang tinggi merugikan banyak pihak:
+Fenomena tingkat _dropout_ yang tinggi ini membawa dampak negatif yang signifikan bagi berbagai pihak:
+* **Bagi Mahasiswa:** Kehilangan waktu, biaya investasi pendidikan, serta kesempatan karir masa depan yang lebih baik.
+* **Bagi Institusi:** Kehilangan potensi pendapatan dari biaya kuliah (SPP) secara berkelanjutan, menurunnya efisiensi alokasi kapasitas kelas, serta berisiko menurunkan reputasi atau nilai akreditasi institusi di mata publik.
 
-- Mahasiswa kehilangan waktu dan biaya.
-- Institusi kehilangan pendapatan dan reputasi.
-- Kapasitas kelas terpakai, tetapi tidak menghasilkan lulusan.
+Untuk mengatasi masalah ini, Jaya Jaya Institut berniat beralih dari pendekatan reaktif menjadi proaktif. Institusi ingin memanfaatkan data historis akademik dan profil mahasiswa untuk mendeteksi tanda-tanda kerentanan mahasiswa **sedini mungkin**. Dengan deteksi dini ini, pihak manajemen dan tim akademik dapat memberikan intervensi berupa bimbingan khusus atau konseling sebelum mahasiswa benar-benar mengambil keputusan untuk mundur.
 
-Pada dataset ini, **32,1%** mahasiswa (1.421 dari 4.424) berstatus _dropout_. Hampir 1 dari 3 mahasiswa tidak lulus. Institusi ingin mengenali mahasiswa berisiko **sedini mungkin**, lalu memberi bimbingan khusus sebelum terlambat.
 
 ## Permasalahan Bisnis
 
-Tingginya angka dropout di Jaya Jaya Institut yang mencapai 32,1% (hampir 1 dari 3 mahasiswa) merupakan sebuah alarm bahaya yang mengancam stabilitas finansial dan reputasi institusi. Selama ini, pihak manajemen dan tim akademik hanya bertindak secara reaktif—mengetahui mahasiswa keluar setelah proses dropout resmi terjadi, sehingga bimbingan konseling atau intervensi akademik sudah terlambat untuk diberikan.
+Tingginya angka mahasiswa yang tidak menyelesaikan studi di Jaya Jaya Institut menjadi ancaman nyata bagi stabilitas operasional, finansial, dan reputasi jangka panjang institusi. Masalah utama yang dihadapi saat ini adalah mekanisme penanganan mahasiswa yang masih bersifat reaktif. Pihak manajemen dan tim penasihat akademik umumnya baru mengetahui mahasiswa keluar setelah proses *dropout* resmi terdaftar pada administrasi, sehingga momentum untuk memberikan bantuan akademik atau konseling psikologis sudah terlambat.
 
-Akar masalah dari fenomena ini adalah ketiadaan visibilitas dan sistem deteksi dini yang mampu menyaring data historis mahasiswa secara real-time. Institusi belum mengetahui secara pasti bagaimana faktor finansial (seperti kelancaran pembayaran SPP dan status utang), faktor demografi (usia saat mendaftar, gender, latar belakang orang tua), serta performa akademik di awal semester saling berinteraksi memicu keputusan mahasiswa untuk berhenti kuliah. Akibatnya, alokasi sumber daya bimbingan konseling menjadi tidak tepat sasaran.
+Kondisi reaktif ini disebabkan oleh ketiadaan sistem pemantauan terpusat dan alat deteksi dini yang mampu mengidentifikasi mahasiswa rentan secara *real-time*. Institusi belum memiliki visibilitas yang jelas mengenai bagaimana faktor demografi (seperti usia saat mendaftar atau latar belakang keluarga), faktor finansial (seperti status beasiswa dan kelancaran pembayaran SPP), serta performa akademik pada semester-semester awal saling berinteraksi dalam memengaruhi keputusan mahasiswa untuk berhenti kuliah. Tanpa adanya informasi ini, alokasi sumber daya untuk program bimbingan mahasiswa menjadi tidak terarah dan kurang tepat sasaran.
 
-Oleh karena itu, permasalahan utama yang ingin diselesaikan melalui proyek data science ini adalah bagaimana mentransformasi data rekam jejak mahasiswa yang terpisah-pisah menjadi sebuah sistem prediksi otomatis dan dashboard monitoring. Sistem ini harus mampu mengidentifikasi mahasiswa yang berada di zona berisiko tinggi (high-risk) sedini mungkin—bahkan sejak akhir semester pertama studi mereka. Dengan begitu, tim akademik dapat melakukan intervensi bimbingan khusus yang terukur dan tepat waktu, yang pada akhirnya dapat menekan laju angka dropout dan menyelamatkan reputasi serta pendapatan institusi.
+Oleh karena itu, proyek data science ini bertujuan untuk menjawab permasalahan tersebut dengan membangun sistem prediksi otomatis berbasis machine learning beserta dashboard monitoring. Sistem ini dirancang untuk menyaring rekam jejak mahasiswa dan mengidentifikasi mereka yang berada dalam zona berisiko tinggi (*high-risk*) sejak awal masa studi mereka. Melalui solusi digital ini, Jaya Jaya Institut dapat mengimplementasikan program intervensi yang terukur, tepat waktu, dan tepat sasaran demi menekan laju angka *dropout* mahasiswa.
+
 
 ## Cakupan Proyek
 
