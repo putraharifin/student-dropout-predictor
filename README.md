@@ -20,11 +20,11 @@ Pada dataset ini, **32,1%** mahasiswa (1.421 dari 4.424) berstatus _dropout_. Ha
 
 ## Permasalahan Bisnis
 
-1. Faktor apa yang paling berkaitan dengan _dropout_, seperti biaya kuliah, beasiswa, usia, program studi, dan nilai?
-2. Bagaimana institusi **memprediksi** mahasiswa yang berisiko _dropout_ secara otomatis?
-3. Seberapa dini prediksi itu bisa dilakukan?
-4. Bagaimana pimpinan dan tim akademik **memantau** performa mahasiswa dengan mudah?
-5. Tindakan apa yang harus institusi ambil untuk menurunkan angka _dropout_?
+Tingginya angka dropout di Jaya Jaya Institut yang mencapai 32,1% (hampir 1 dari 3 mahasiswa) merupakan sebuah alarm bahaya yang mengancam stabilitas finansial dan reputasi institusi. Selama ini, pihak manajemen dan tim akademik hanya bertindak secara reaktif—mengetahui mahasiswa keluar setelah proses dropout resmi terjadi, sehingga bimbingan konseling atau intervensi akademik sudah terlambat untuk diberikan.
+
+Akar masalah dari fenomena ini adalah ketiadaan visibilitas dan sistem deteksi dini yang mampu menyaring data historis mahasiswa secara real-time. Institusi belum mengetahui secara pasti bagaimana faktor finansial (seperti kelancaran pembayaran SPP dan status utang), faktor demografi (usia saat mendaftar, gender, latar belakang orang tua), serta performa akademik di awal semester saling berinteraksi memicu keputusan mahasiswa untuk berhenti kuliah. Akibatnya, alokasi sumber daya bimbingan konseling menjadi tidak tepat sasaran.
+
+Oleh karena itu, permasalahan utama yang ingin diselesaikan melalui proyek data science ini adalah bagaimana mentransformasi data rekam jejak mahasiswa yang terpisah-pisah menjadi sebuah sistem prediksi otomatis dan dashboard monitoring. Sistem ini harus mampu mengidentifikasi mahasiswa yang berada di zona berisiko tinggi (high-risk) sedini mungkin—bahkan sejak akhir semester pertama studi mereka. Dengan begitu, tim akademik dapat melakukan intervensi bimbingan khusus yang terukur dan tepat waktu, yang pada akhirnya dapat menekan laju angka dropout dan menyelamatkan reputasi serta pendapatan institusi.
 
 ## Cakupan Proyek
 
