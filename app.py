@@ -254,7 +254,7 @@ with tab_satu:
     c4.metric("Tingkat risiko dropout", risiko)
 
     st.bar_chart(pd.DataFrame({"Peluang": [p["Dropout"], p["Enrolled"], p["Graduate"]]},
-                              index=["Dropout", "Active/Enrolled", "Graduate"]), horizontal=True, height=200)
+                              index=["Dropout", "Active/Enrolled", "Graduate"]), height=200)
 
     if proba.max() < 0.70:
         st.info("Keyakinan model di bawah 70%. Pada data uji, prediksi seperti ini jauh kurang akurat. "
