@@ -1,17 +1,20 @@
 {
-  "model": "XGBoost",
+  "model": "LightGBM",
+  "target": "1 = Dropout, 0 = Graduate",
+  "n_train_total": 3630,
+  "n_enrolled_excluded": 794,
   "test_metrics": {
-    "Accuracy": 0.735593220338983,
-    "Precision (macro)": 0.698083495575533,
-    "Recall (macro)": 0.7042252853089014,
-    "F1 (macro)": 0.6950532692101992,
-    "F1 (weighted)": 0.7450069820674878,
-    "ROC-AUC (OvR)": 0.8878171213404227,
-    "Recall Dropout": 0.6971830985915493
+    "Accuracy": 0.931129476584022,
+    "Precision (Dropout)": 0.903448275862069,
+    "Recall (Dropout)": 0.9225352112676056,
+    "F1 (Dropout)": 0.9128919860627178,
+    "F1 (macro)": 0.9279721889311311,
+    "ROC-AUC": 0.9733366260913899,
+    "PR-AUC": 0.9726128560880681
   },
-  "cv_tuning": {
-    "Random Forest": 0.7178358855272765,
-    "XGBoost": 0.7333655340577431,
-    "LightGBM": 0.7309850373628038
+  "cv_tuning_f1_dropout": {
+    "Random Forest": 0.8657444218316269,
+    "XGBoost": 0.8725986072654645,
+    "LightGBM": 0.8738719834146836
   }
 }

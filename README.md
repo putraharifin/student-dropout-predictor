@@ -1,6 +1,6 @@
 # Proyek Akhir: Menyelesaikan Permasalahan Jaya Jaya Institut
 
-Proyek ini membangun sistem deteksi dini mahasiswa yang berisiko _dropout_. Sistem terdiri dari analisis data, model machine learning, prototype Streamlit, dan rancangan dashboard monitoring.
+Proyek ini membangun sistem deteksi dini mahasiswa yang berisiko *dropout*. Sistem terdiri dari analisis data, model machine learning, prototype Streamlit, dan rancangan dashboard monitoring.
 
 - **Nama:** Muhammad Putra Harifin Pane
 - **Email:** putraharifin@gmail.com
@@ -29,17 +29,18 @@ Oleh karena itu, proyek data science ini bertujuan untuk menjawab permasalahan t
 ## Cakupan Proyek
 
 **Yang dikerjakan:**
-
 - Analisis data eksploratif (EDA) mendalam: distribusi, outlier, korelasi, uji statistik (Chi-square dan Kruskal-Wallis), serta analisis per faktor keuangan, akademik, demografi, dan program studi.
 - Feature engineering dari kinerja akademik (rasio kelulusan, tren nilai).
-- Model klasifikasi tiga kelas: `Dropout`, `Enrolled`, `Graduate`. Model yang dibandingkan: Logistic Regression, Random Forest, XGBoost, dan LightGBM.
-- Analisis skenario deteksi dini (saat pendaftaran, akhir semester 1, akhir semester 2).
+- **Filtering data.** Hanya mahasiswa berstatus `Dropout` dan `Graduate` (3.630 mahasiswa) yang dipakai untuk melatih model. Status `Enrolled` (794 mahasiswa) belum punya hasil akhir. Jika ikut dilatih, target menjadi tidak jelas. Karena itu kita memisahkannya.
+- **Target biner:** `1 = Dropout`, `0 = Graduate`.
+- Model klasifikasi biner. Model yang dibandingkan: Logistic Regression, Random Forest, XGBoost, dan LightGBM.
+- **Prediksi data Enrolled.** Setelah model jadi, kita memakainya untuk menilai potensi dropout mahasiswa `Enrolled`.
+- Analisis ambang keputusan dan skenario deteksi dini (saat pendaftaran, akhir semester 1, akhir semester 2).
 - Prototype aplikasi Streamlit untuk prediksi satu mahasiswa dan prediksi massal lewat CSV.
 - Data siap pakai untuk dashboard (`dashboard_data.csv`) dan rancangan layout dashboard.
-- Rekomendasi _action items_.
+- Rekomendasi *action items*.
 
 **Di luar cakupan:**
-
 - Integrasi langsung dengan sistem akademik kampus.
 - Uji coba intervensi di lapangan (A/B test).
 - Analisis sebab-akibat. Proyek ini hanya menunjukkan hubungan antar variabel.
@@ -87,24 +88,28 @@ jupyter notebook notebook.ipynb
 
 ## Business Dashboard
 
-Dashboard membantu pimpinan dan tim akademik memantau risiko _dropout_ tanpa membaca kode. Dashboard memakai file `dashboard_data.csv`. File ini berisi label yang mudah dibaca, kelompok usia, rasio kelulusan, **skor risiko dropout**, dan **tingkat risiko** (Rendah, Sedang, Tinggi) untuk setiap mahasiswa.
+Dashboard membantu pimpinan dan tim akademik memantau risiko *dropout* tanpa membaca kode. Dashboard memakai file `dashboard_data.csv`. File ini berisi label yang mudah dibaca, kelompok usia, rasio kelulusan, **skor risiko dropout**, dan **tingkat risiko** (Rendah, Sedang, Tinggi) untuk setiap mahasiswa.
 
-Skor risiko berasal dari prediksi _out-of-fold_. Model menilai tiap mahasiswa tanpa pernah melihat data mahasiswa itu. Dengan cara ini skor tidak bocor. Pada skor ini, kelompok risiko **Tinggi benar-benar dropout 90,8%**, **Sedang 46,3%**, dan **Rendah 9,3%**.
+Asal skor risiko dijelaskan di kolom `Score_source`:
+- **Mahasiswa Dropout dan Graduate:** skor *out-of-fold*. Model menilai tiap mahasiswa tanpa pernah melihat data mahasiswa itu, sehingga skor tidak bocor. Pada mahasiswa berlabel, kelompok risiko **Tinggi benar-benar dropout 93,5%**, **Sedang 37,5%**, dan **Rendah 7,7%**.
+- **Mahasiswa Enrolled:** skor dari model final. Ini prediksi potensi dropout untuk masa mendatang. Dari 794 mahasiswa `Enrolled`, 370 masuk risiko Tinggi, 83 Sedang, dan 341 Rendah.
 
-**Link dashboard:** _(tempel link Looker Studio / Tableau Public Anda di sini. Pastikan akses "siapa saja yang memiliki link".)_
+**Link dashboard:** __https://datastudio.google.com/reporting/6d7ba714-3d61-4b09-997f-fd2b0ae6e8f8_
 
 ### Metrik utama yang dipantau
 
-| Metrik                                 | Definisi                                               | Mengapa penting                                      |
-| -------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------- |
-| Tingkat dropout                        | Mahasiswa `Dropout` / total mahasiswa                  | Indikator utama. Nilai dasar: 32,1%.                 |
-| Tingkat kelulusan                      | Mahasiswa `Graduate` / total mahasiswa                 | Pasangan dari tingkat dropout. Nilai dasar: 49,9%.   |
-| Mahasiswa risiko tinggi                | Jumlah mahasiswa dengan `Risk_level = Tinggi`          | Daftar prioritas bimbingan.                          |
-| Tingkat menunggak                      | Mahasiswa dengan `Tuition_fees_up_to_date = 0` / total | Penunggak dropout sekitar 87%.                       |
-| Rasio kelulusan MK semester 2          | MK lulus / MK diambil                                  | Fitur terpenting model.                              |
-| Mahasiswa tanpa MK lulus di semester 2 | Jumlah dan persentase                                  | Sekitar 51% mahasiswa dropout berada di kondisi ini. |
-| Cakupan beasiswa                       | Penerima beasiswa / total                              | Penerima dropout sekitar 12%, non-penerima 39%.      |
-| Dropout per program studi              | Dropout / total per `Course_name`                      | Menemukan program yang bermasalah.                   |
+| Metrik | Definisi | Mengapa penting |
+|--------|----------|-----------------|
+| Tingkat dropout | Mahasiswa `Dropout` / total mahasiswa | Indikator utama. Nilai dasar: 32,1%. |
+| Tingkat kelulusan | Mahasiswa `Graduate` / total mahasiswa | Pasangan dari tingkat dropout. Nilai dasar: 49,9%. |
+| Mahasiswa risiko tinggi | Jumlah mahasiswa dengan `Risk_level = Tinggi` | Daftar prioritas bimbingan. |
+| Mahasiswa Enrolled berisiko tinggi | `Status = Enrolled` dan `Risk_level = Tinggi` | Mahasiswa aktif yang masih bisa dibantu sekarang. |
+| Tingkat menunggak | Mahasiswa dengan `Tuition_fees_up_to_date = 0` / total | Penunggak dropout sekitar 87%. |
+| Rasio kelulusan MK semester 2 | MK lulus / MK diambil | Fitur terpenting model. |
+| Mahasiswa tanpa MK lulus di semester 2 | Jumlah dan persentase | Sekitar 51% mahasiswa dropout berada di kondisi ini. |
+| Cakupan beasiswa | Penerima beasiswa / total | Penerima dropout sekitar 12%, non-penerima 39%. |
+| Dropout per program studi | Dropout / total per `Course_name` | Menemukan program yang bermasalah. |
+
 
 ### layout dashboard (Looker Studio)
 
@@ -152,8 +157,7 @@ Gunakan 4 halaman (tab). Beri filter global di bagian atas: **Program studi**, *
 3. Buat 4 halaman sesuai tabel di atas. Pasang filter global.
 4. Beri warna konsisten: merah untuk Dropout, kuning untuk Enrolled, teal untuk Graduate.
 5. Atur akses berbagi agar reviewer dapat membuka dashboard, lalu simpan screenshot sebagai `putraharifin25-dashboard.png`.
-
-**Link Dashboard:** _https://datastudio.google.com/reporting/6d7ba714-3d61-4b09-997f-fd2b0ae6e8f8_ 
+ 
 
 
 ## Menjalankan Sistem Machine Learning
