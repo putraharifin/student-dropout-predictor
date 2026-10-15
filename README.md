@@ -64,7 +64,7 @@ submission
 └── putraharifin25-dashboard.png
 ```
 
-**Setup environment:**  Python yang digunakan versi 3.11.
+**Setup environment:** Python yang digunakan versi 3.11.
 
 ```bash
 # 1. Buat virtual environment
@@ -129,18 +129,18 @@ Gunakan 4 halaman (tab). Beri filter global di bagian atas: **Program studi**, *
 
 **Halaman 3: Akademik**
 
-| Komponen                            | Jenis chart                      | Field                                                                    |
-| ----------------------------------- | -------------------------------- | ------------------------------------------------------------------------ |
-| MK lulus semester 1 vs semester 2   | Scatter plot berwarna per status | `Curricular_units_1st_sem_approved`, `Curricular_units_2nd_sem_approved` |
-| Distribusi nilai semester           | Box plot per status              | `Curricular_units_1st_sem_grade`, `Curricular_units_2nd_sem_grade`       |
-| Rata-rata MK lulus                  | Bar chart berkelompok            | Semester x `Status`                                                      |
-| Persentase 0 MK lulus di semester 2 | Bar chart                        | `Curricular_units_2nd_sem_approved = 0` per `Status`                     |
+| Komponen                            | Jenis chart               | Field                                                                    |
+| ----------------------------------- | ------------------------- | ------------------------------------------------------------------------ |
+| MK lulus semester 1 vs semester 2   | Line Chart (Grafik Garis)        | `Curricular_units_1st_sem_approved`, `Curricular_units_2nd_sem_approved` |
+| Distribusi nilai semester           | Box plot per status       | `Curricular_units_1st_sem_grade`, `Curricular_units_2nd_sem_grade`       |
+| Rata-rata MK lulus                  | Bar chart berkelompok     | Semester x `Status`                                                      |
+| Persentase 0 MK lulus di semester 2 | Bar chart                 | `Curricular_units_2nd_sem_approved = 0` per `Status`                     |
 
 **Halaman 4: Daftar pantau (early warning)**
 
 | Komponen                       | Jenis chart                                                         | Field                                                                                                                  |
 | ------------------------------ | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Distribusi tingkat risiko      | Bar chart / donut                                                   | `Risk_level`                                                                                                           |
+| Distribusi tingkat risiko      |  donut chart                                                   | `Risk_level`                                                                                                           |
 | Daftar mahasiswa berisiko      | Tabel dengan pewarnaan kondisional, urut `Risk_score_dropout` turun | `Student_ID`, `Course_name`, `Risk_score_dropout`, `Risk_level`, `Tuition_fees_up_to_date_label`, `Approval_rate_sem2` |
 | Risiko per program             | Heatmap                                                             | `Course_name` x `Risk_level`                                                                                           |
 | Skor risiko vs rasio kelulusan | Scatter plot                                                        | `Approval_rate_sem2` x `Risk_score_dropout`                                                                            |
@@ -151,7 +151,10 @@ Gunakan 4 halaman (tab). Beri filter global di bagian atas: **Program studi**, *
 2. Buat _calculated field_ `Dropout_flag` = `CASE WHEN Status = "Dropout" THEN 1 ELSE 0 END`. Rata-rata field ini menghasilkan % dropout.
 3. Buat 4 halaman sesuai tabel di atas. Pasang filter global.
 4. Beri warna konsisten: merah untuk Dropout, kuning untuk Enrolled, teal untuk Graduate.
-5. Atur akses berbagi agar reviewer dapat membuka dashboard, lalu simpan screenshot sebagai `username_dicoding-dashboard.png`.
+5. Atur akses berbagi agar reviewer dapat membuka dashboard, lalu simpan screenshot sebagai `putraharifin25-dashboard.png`.
+
+**Link Dashboard:** _https://datastudio.google.com/reporting/6d7ba714-3d61-4b09-997f-fd2b0ae6e8f8_ 
+
 
 ## Menjalankan Sistem Machine Learning
 
