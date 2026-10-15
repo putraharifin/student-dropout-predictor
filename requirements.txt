@@ -1,0 +1,16 @@
+# Aplikasi Streamlit (app.py)
+streamlit>=1.50.0
+
+# Versi library model dikunci karena file model.joblib dibuat dengan versi ini.
+# Gunakan Python 3.11 atau lebih baru.
+scikit-learn==1.8.0
+xgboost==3.4.1
+lightgbm==4.7.0
+joblib>=1.4.0
+
+# Analisis data (notebook.ipynb)
+numpy>=2.0,<3
+pandas>=2.2,<4
+scipy>=1.11
+matplotlib>=3.8
+seaborn>=0.13
